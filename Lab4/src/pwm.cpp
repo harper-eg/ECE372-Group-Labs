@@ -30,12 +30,6 @@ void initPWM(){
 /*
  * Changes the duty cycle of the PWM signal based on the 10-bit ADC value.
  * The adcValue is the combination of ADCH and ADCL (0-1023).
- * This value determines both speed and direction per the potentiometer table:
- *   0V (0)       -> clockwise, max rpm
- *   0V-2.5V (0-511)   -> clockwise, decreasing rpm (linearly)
- *   2.5V (512)   -> stopped (0 rpm)
- *   2.5V-5V (512-1023) -> counterclockwise, increasing rpm (linearly)
- *   5V (1023)    -> counterclockwise, max rpm
  */
 void changeDutyCycle(unsigned int adcValue){
     // TODO: Map adcValue to duty cycle and direction

@@ -3,10 +3,6 @@
 // Date:
 // Assignment:     Lab 4
 //
-// Description: This file contains a programmatic overall description of the
-// program. It should never contain assignments to special function registers
-// for the exception key one-line code such as checking the state of the pin.
-//
 //----------------------------------------------------------------------//
 #include <Arduino.h>
 #include <avr/io.h>
@@ -30,7 +26,7 @@ typedef enum buttonState_enum {
 // TODO: Define states for the main state machine
 // e.g., motor_running, motor_off_countdown, etc.
 
-// Initialize states (pattern from Lab 2/3)
+// Initialize states
 volatile buttonState switchState = wait_press;
 
 // TODO: Add volatile variables for countdown, motor state, etc.
@@ -94,7 +90,7 @@ int main(){
 *  On valid press: turn motor off, start 9-to-0 countdown.
 */
 ISR(INT0_vect){
-  // Debounce pattern (adapted from Lab 2/3 PCINT0_vect ISR)
+  // Debounce 
   if (switchState == wait_press) {
     switchState = debounce_press;
   }

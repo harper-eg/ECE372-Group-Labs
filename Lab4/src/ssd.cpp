@@ -6,11 +6,6 @@
 // Description: This file implements the seven segment display
 // driven via shift register on PORTC pins (PC0-PC2) in common cathode
 // configuration.
-//
-// Pin mapping (from mappings.txt):
-//   PC0 -> Shift register Q1 (e.g., SER / serial data)
-//   PC1 -> Shift register Q2 (e.g., SRCLK / shift clock)
-//   PC2 -> Shift register Q3 (e.g., RCLK / latch clock)
 //----------------------------------------------------------------------//
 
 #include "ssd.h"
