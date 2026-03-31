@@ -16,15 +16,24 @@
  */
 void initPWM(){
     // Motor direction pins: PB0 (IN1) and PB1 (IN2) on L293D
-    DDRB |= (1 << DDB0) | (1 << DDB1); // Set PB0 and PB1 as outputs
-
+    DDRB |= (1 << DDB0) | (1 << DDB1); // Set PB0 and PB1 as outputs 
+    
+    
     // TODO: Configure Timer3 for PWM mode (Fast PWM or Phase Correct)
     //       using WGM bits in TCCR3A/TCCR3B
+
+    TCCR3A |= ((1 << WGM31) | (1 << WGM30));
+    TCCR3B |= (1 << WGM32) | (1<<CS31);
+    TCCR3B &= ~((1 << WGM33) |(1<<CS30)|(1<<CS32));
+    
+
     // TODO: Set OC3A output pin (PE3, Arduino pin 5) direction via DDRE
-    // TODO: Configure compare output mode (COM3A bits in TCCR3A)
+    DDRE |= (1<<DDE3);
+    // TODO: Configure compare output mode (COM3A bits in TCCR3A) will need to decide 
+    TCCR3A |= (1<<COM3A1);
+    TCCR3A &= ~(1<<COM3A0);
     // TODO: Set prescaler (CS3x bits in TCCR3B)
-    // TODO: (Optional) Configure Timer4 similarly if using two PWM signals
-    //       OC4A is on PH3 (Arduino pin 6)
+OCR3A =  255;
 }
 
 /*
@@ -33,6 +42,7 @@ void initPWM(){
  */
 void changeDutyCycle(unsigned int adcValue){
     // TODO: Map adcValue to duty cycle and direction
+    // D = OCR3A/ TOP
     // TODO: Set OCR3A (and optionally OCR4A) to control speed
     // TODO: Control direction via PB0 (IN1) and PB1 (IN2) on L293D:
     //       Clockwise:          PB0 = HIGH, PB1 = LOW
