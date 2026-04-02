@@ -31,7 +31,6 @@ typedef enum buttonState_enum {
 
 // Initialize states
 volatile buttonState switchState = wait_press;
-
 // TODO: Add volatile variables for countdown, motor state, etc.
 
 
@@ -73,6 +72,7 @@ int main(){
     // TODO: Implement main state machine
     // State: motor_running
     //   - Read ADC value from potentiometer
+
     //   - Call changeDutyCycle() with the ADC value
     //   - Motor runs at speed/direction per potentiometer table
     //
