@@ -14,5 +14,5 @@
 void initADC();
 
 // TODO: Add prototype for function to read ADC value (returns 10-bit result)
-
+int readADC();
 #endif
