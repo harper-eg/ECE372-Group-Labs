@@ -33,7 +33,7 @@ void initPWM(){
     TCCR3A |= (1<<COM3A1);
     TCCR3A &= ~(1<<COM3A0);
     // TODO: Set prescaler (CS3x bits in TCCR3B)
-OCR3A =  255;
+    OCR3A =  255;
 }
 
 /*

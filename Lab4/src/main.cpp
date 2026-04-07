@@ -17,10 +17,7 @@
 #include "ssd.h"
 
 
-/*
- * Define a set of states that can be used in the state machine using an enum.
- * (Pattern reused from Lab 2/3)
- */
+// Define a set of states that can be used in the state machine using an enum.
 typedef enum buttonState_enum {
   wait_press, debounce_press,
   wait_release, debounce_release
@@ -36,7 +33,7 @@ volatile buttonState switchState = wait_press;
 
 int main(){
 
-  sei(); // Enable global interrupts (from Lab 2/3)
+  sei(); // Enable global interrupts
 
   initTimer0();
   initTimer1();
@@ -50,10 +47,10 @@ int main(){
 
   /*
   * Implement a state machine in the while loop which achieves the assignment
-  * requirements. (Pattern reused from Lab 2/3)
+  * requirements. 
   */
 	while (1) {
-    // Debouncing for button (reused from Lab 2/3)
+    // Debouncing for button 
     switch(switchState) {
       case wait_press:
         break;
