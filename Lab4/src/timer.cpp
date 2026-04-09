@@ -61,3 +61,14 @@ void initTimer1(){
 }
 
 // TODO: Implement any helper functions to start/stop Timer1 for the countdown
+
+void startTimer1() {
+    // Set OCR1A for 1-second interval with prescaler of 1024
+    OCR1A = 15624; // (16MHz / 1024) - 1 = 15624 counts for 1 second
+
+    // Enable Timer1 compare match A interrupt
+    TIMSK1 |= (1 << OCIE1A);
+
+    // Start Timer1 with prescaler of 1024
+    TCCR1B |= (1 << CS12) | (0 << CS11) | (1 << CS10);
+}

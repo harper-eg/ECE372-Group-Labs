@@ -9,6 +9,7 @@
 //----------------------------------------------------------------------//
 
 #include "ssd.h"
+#include "timer.h"
 
 // Initialize PORTC pins as outputs for the seven segment display
 void initSSD(){
@@ -49,11 +50,13 @@ void displayDigit(unsigned char digit){
 
         // Pulse shift clock (PC1)
         PORTC |= (1 << PORTC1);
+        delayMs(1); // Short delay to ensure clock is registered
         PORTC &= ~(1 << PORTC1);
     }
 
     // Pulse latch clock (PC2) to output data to display
     PORTC |= (1 << PORTC2);
+    delayMs(1); // Short delay to ensure data is latched
     PORTC &= ~(1 << PORTC2);
 }
 
@@ -69,10 +72,12 @@ void turnOffSSD(){
     // Repeatedly pulse shift register clock to input data
     for (int i = 0; i < 8; i++) {
         PORTC |= (1 << PORTC1);
+        delayMs(1); // Short delay to ensure clock is registered
         PORTC &= ~(1 << PORTC1);
     }
 
     // Pulse latch to output
     PORTC |= (1 << PORTC2);
+    delayMs(1); // Short delay to ensure data is latched
     PORTC &= ~(1 << PORTC2);
 }
