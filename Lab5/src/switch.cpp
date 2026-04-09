@@ -1,0 +1,1 @@
+// Uses a switch to silence the audio chirping alarm.
