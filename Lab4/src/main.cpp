@@ -44,6 +44,7 @@ int main(){
   initADC();
   initPWM();
   initSSD();
+  Serial.begin(9600); // Initialize serial communication for debugging
 
   // TODO: Initialize main state machine state
 
@@ -84,6 +85,7 @@ int main(){
     //   - When countdown reaches 0, turn off display, re-enable INT0,
     //     and transition back to motor_running
     if (switchState == wait_release && countdown <= 0) {
+      Serial.println("Button pressed, starting countdown");
       countdown = 9; // Reset countdown when button is pressed
       startTimer1(); // Start timer 1 for countdown
       // start timer 1 for countdown
@@ -101,6 +103,8 @@ int main(){
       if (countdown >= 0) {
       displayDigit(countdown);
       countdown -= 1; // Example countdown decrement, replace with actual timer interrupt logic
+      Serial.print("Countdown: ");
+      Serial.println(countdown);
       }
       else {
         turnOffSSD();
