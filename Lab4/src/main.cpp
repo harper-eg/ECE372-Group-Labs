@@ -43,6 +43,7 @@ int main(){
   initADC();
   initPWM();
   initSSD();
+  Serial.begin(9600); // Initialize serial communication for debugging
 
   while (1) {
     // Debouncing for button
@@ -61,6 +62,7 @@ int main(){
         break;
     }
 
+<<<<<<< HEAD
     // Main state machine
     switch(appState) {
       case motor_running:
@@ -70,6 +72,23 @@ int main(){
           changeDutyCycle(adcValue);
         }
         break;
+=======
+    //   - Call changeDutyCycle() with the ADC value
+    //   - Motor runs at speed/direction per potentiometer table
+    //
+    // State: motor_off_countdown
+    //   - Motor is off
+    //   - Seven segment display counts down from 9 to 0
+    //   - INT0 interrupt is disabled
+    //   - When countdown reaches 0, turn off display, re-enable INT0,
+    //     and transition back to motor_running
+    if (switchState == wait_release && countdown <= 0) {
+      Serial.println("Button pressed, starting countdown");
+      countdown = 9; // Reset countdown when button is pressed
+      startTimer1(); // Start timer 1 for countdown
+      // start timer 1 for countdown
+    }
+>>>>>>> be18a2641fc2968e90eae6e83aaf6a1484063f4b
 
       case motor_off_countdown:
         // Motor stays off
@@ -94,6 +113,35 @@ int main(){
         }
         break;
     }
+<<<<<<< HEAD
+=======
+    else {
+      changeDutyCycle(0); // Turn off motor when countdown reaches 0
+    }
+  
+    if (sevenSegmentTimerFlag) {
+      if (countdown >= 0) {
+      displayDigit(countdown);
+      countdown -= 1; // Example countdown decrement, replace with actual timer interrupt logic
+      Serial.print("Countdown: ");
+      Serial.println(countdown);
+      }
+      else {
+        turnOffSSD();
+      }
+      
+      if (countdown >= 0) {
+        displayDigit(countdown);
+        countdown -= 1; // Example countdown decrement, replace with actual timer interrupt logic
+      }
+      else {
+        turnOffSSD();
+      }
+      sevenSegmentTimerFlag = false; // Reset flag until next timer interrupt
+      startTimer1(); // Start timer 1 for countdown
+    }
+  return 0;
+>>>>>>> be18a2641fc2968e90eae6e83aaf6a1484063f4b
   }
 
   return 0;
