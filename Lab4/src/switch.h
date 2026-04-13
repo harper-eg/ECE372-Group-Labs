@@ -10,8 +10,7 @@
 #define SWITCH_H
 
 void initSwitchPD0();
-
-// TODO: Add prototypes for enabling/disabling the external interrupt
-// (needed to disable INT0 during countdown, re-enable after)
+void disableINT0();
+void enableINT0();
 
 #endif

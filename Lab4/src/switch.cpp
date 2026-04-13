@@ -19,10 +19,18 @@ void initSwitchPD0(){
     DDRD &= ~(1 << DDD0); // Input
     PORTD |= (1 << PORTD0); // Enable pull-up
 
-    // TODO: Configure INT0 interrupt sense control for any logical change
-    //       (EICRA register, ISC00/ISC01 bits)
-    // TODO: Enable INT0 in EIMSK register
+    // Configure INT0 for any logical change
+    EICRA |= (1 << ISC00);
+    EICRA &= ~(1 << ISC01);
+
+    // Enable INT0
+    EIMSK |= (1 << INT0);
 }
 
-// TODO: Implement function to disable INT0 (for use during countdown)
-// TODO: Implement function to enable INT0 (for use after countdown)
+void disableINT0() {
+    EIMSK &= ~(1 << INT0);
+}
+
+void enableINT0() {
+    EIMSK |= (1 << INT0);
+}

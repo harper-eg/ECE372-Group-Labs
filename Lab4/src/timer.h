@@ -15,8 +15,6 @@ void initTimer0();
 void delayMs(unsigned int delay);
 void initTimer1();
 void startTimer1();
-
-// TODO: Add any additional timer function prototypes needed for
-// the 10-second countdown (Timer1 with ISR)
+void stopTimer1();
 
 #endif

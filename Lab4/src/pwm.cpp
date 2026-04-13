@@ -33,7 +33,7 @@ void initPWM(){
     TCCR3A |= (1<<COM3A1);
     TCCR3A &= ~(1<<COM3A0);
     // TODO: Set prescaler (CS3x bits in TCCR3B)
-    OCR3A =  255;
+    OCR3A = 0; // Start with motor off
 }
 
 /*
@@ -41,29 +41,25 @@ void initPWM(){
  * The adcValue is the combination of ADCH and ADCL (0-1023).
  */
 void changeDutyCycle(unsigned int adcValue){
-    int dutyCycle;
-    // TODO: Map adcValue to duty cycle and direction
-    if (adcValue < 127) {
-        dutyCycle = (adcValue - 127) * 255 * 2 / 1023; // Map 0-1023 to 0-255
-        PORTB |= (1 << PORTB0); // Clockwise: PB0 = HIGH, PB1 = LOW
+    unsigned int dutyCycle;
+
+    // Midpoint is 512 (~2.5V). Below = clockwise, above = counterclockwise.
+    if (adcValue < 512) {
+        // Map 0→255 (max CW), 511→0 (stopped)
+        dutyCycle = ((uint32_t)(512 - adcValue) * 255) / 512;
+        PORTB |= (1 << PORTB0);   // Clockwise: PB0 = HIGH, PB1 = LOW
         PORTB &= ~(1 << PORTB1);
     }
-    else if (adcValue == 127) {
-        dutyCycle = 0; // Stop motor at midpoint
-        PORTB &= ~((1 << PORTB0) | (1 << PORTB1)); // Stop: PB0 = LOW, PB1 = LOW
-    }
-    else {
-        dutyCycle = adcValue * 255 * 2 / 1023; // Map 0-1023 to 0-255
-        PORTB |= (1 << PORTB1); // Counterclockwise: PB0 = LOW, PB1 = HIGH
+    else if (adcValue > 512) {
+        // Map 513→0 (stopped), 1023→255 (max CCW)
+        dutyCycle = ((uint32_t)(adcValue - 512) * 255) / 512;
+        PORTB |= (1 << PORTB1);   // Counterclockwise: PB0 = LOW, PB1 = HIGH
         PORTB &= ~(1 << PORTB0);
     }
+    else {
+        dutyCycle = 0;
+        PORTB &= ~((1 << PORTB0) | (1 << PORTB1)); // Stop: both LOW
+    }
 
-    // D = OCR3A/ TOP
-    // TODO: Set OCR3A (and optionally OCR4A) to control speed
     OCR3A = dutyCycle;
-    // TODO: Control direction via PB0 (IN1) and PB1 (IN2) on L293D:
-    //       Clockwise:          PB0 = HIGH, PB1 = LOW
-    //       Counterclockwise:   PB0 = LOW,  PB1 = HIGH
-    //       Stop:               PB0 = LOW,  PB1 = LOW
-
 }
