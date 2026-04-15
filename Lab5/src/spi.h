@@ -4,4 +4,6 @@
 
 #include <avr/io.h>
 
+// put functions for spi.cpp
+
 #endif

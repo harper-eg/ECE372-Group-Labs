@@ -6,6 +6,8 @@
 // - Set two wire interface bit rate register TWBR
 // - Enable two wire interface
 
+//set freq 100 kHZ
+
 // 2. StartI2C_Trans(unsigned char SLA)
 // - Clear TWINT, initiate start condition, initiate enable
 // - Wait for completion
