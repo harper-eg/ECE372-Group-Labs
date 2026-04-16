@@ -1,8 +1,5 @@
 #include "i2c.h"
 #include <avr/io.h>
-
-#include "i2c.h"
-#include <avr/io.h>
 #include "timer.h"
 // I2C Functions:
 
