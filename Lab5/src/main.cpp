@@ -1,5 +1,10 @@
 #include <Arduino.h>
 
+
+
+// read address is 7-bit I2C address for the device is 0x1D
+// POwer_CTL register D0 =0, D1=0,D2 = 0, D3 = 1, D4 = 0, D5 = 0
+
 // 1. Two state machines are used for debouncing the switch and for
 // implementing the display of the 8x8 LED smiley or frowny face.
 
