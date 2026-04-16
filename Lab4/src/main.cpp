@@ -62,7 +62,6 @@ int main(){
         break;
     }
 
-<<<<<<< HEAD
     // Main state machine
     switch(appState) {
       case motor_running:
@@ -72,23 +71,6 @@ int main(){
           changeDutyCycle(adcValue);
         }
         break;
-=======
-    //   - Call changeDutyCycle() with the ADC value
-    //   - Motor runs at speed/direction per potentiometer table
-    //
-    // State: motor_off_countdown
-    //   - Motor is off
-    //   - Seven segment display counts down from 9 to 0
-    //   - INT0 interrupt is disabled
-    //   - When countdown reaches 0, turn off display, re-enable INT0,
-    //     and transition back to motor_running
-    if (switchState == wait_release && countdown <= 0) {
-      Serial.println("Button pressed, starting countdown");
-      countdown = 9; // Reset countdown when button is pressed
-      startTimer1(); // Start timer 1 for countdown
-      // start timer 1 for countdown
-    }
->>>>>>> be18a2641fc2968e90eae6e83aaf6a1484063f4b
 
       case motor_off_countdown:
         // Motor stays off
@@ -113,6 +95,7 @@ int main(){
         }
         break;
     }
+    
   }
 
   return 0;

@@ -1,6 +1,9 @@
 #include "i2c.h"
 #include <avr/io.h>
 
+#include "i2c.h"
+#include <avr/io.h>
+#include "timer.h"
 // I2C Functions:
 
 
@@ -84,6 +87,17 @@ TWCR = (1<<TWINT) | (1<<TWEN);
 // - Set two wire interface bit rate register TWBR
 // - Enable two wire interface
 
+void initI2C() {
+  // Set prescaler TWPS to 1
+  TWSR &= ~((1 << TWPS0) | (1 << TWPS1));
+  
+  // Set two wire interface bit rate register TWBR
+  TWBR = 72; // Set bit rate to 100 kHz (assuming F_CPU = 16 MHz)
+  
+  // Enable two wire interface
+  TWCR = (1 << TWEN);
+}
+
 //set freq 100 kHZ
 
 // 2. StartI2C_Trans(unsigned char SLA)
@@ -93,13 +107,46 @@ TWCR = (1<<TWINT) | (1<<TWEN);
 // - Trigger action: Clear TWINT and initiate enable
 // - Wait for completion
 
+void startI2C_Trans(unsigned char SLA) {
+  // Clear TWINT, initiate start condition, initiate enable
+  TWCR = (1 << TWINT) | (1 << TWSTA) | (1 << TWEN);
+  
+  // Wait for completion
+  while (!(TWCR & (1 << TWINT)));
+  
+  // Set two wire data register to the SLA + write bit
+  TWDR = (SLA << 1); // Shift SLA left and add write bit (0)
+  
+  // Trigger action: Clear TWINT and initiate enable
+  TWCR = (1 << TWINT) | (1 << TWEN);
+  
+  // Wait for completion
+  while (!(TWCR & (1 << TWINT)));
+}
+
 // 3. StopI2C_Trans()
 // - Trigger action + stop condition
+
+void stopI2C_Trans() {
+  // Trigger action + stop condition
+  TWCR = (1 << TWINT) | (1 << TWSTO) | (1 << TWEN);
+}
 
 // 4. Write(unsigned char data)
 // - Set two wire data register equal to incoming data
 // - Trigger action
 // - Wait for completion
+
+void write(unsigned char data) {
+  // Set two wire data register equal to incoming data
+  TWDR = data;
+  
+  // Trigger action
+  TWCR = (1 << TWINT) | (1 << TWEN);
+  
+  // Wait for completion
+  while (!(TWCR & (1 << TWINT)));
+}
 
 // 5. Read_from(unsigned char SLA, unsigned Char MEMADDRESS)
 // - Start a transmission to the SLA
@@ -113,5 +160,27 @@ TWCR = (1<<TWINT) | (1<<TWEN);
 // - Wait for completion
 // - Trigger action + stop condition
 
+void read_from(unsigned char SLA, unsigned char MEMADDRESS) {
+  // Start a transmission to the SLA
+  startI2C_Trans(SLA);
+
+  write(MEMADDRESS); // Write to the MEMADDRESS
+  // Clear TWINT, initiate start condition, initiate enable
+  TWCR = (1 << TWINT) | (1 << TWSTA) | (1 << TWEN);
+  // Wait for completion
+  delayMs(10); // Add a small delay to ensure the slave has time to respond
+  // Set two wire data register to the SLA + read bit
+  TWDR = (SLA << 1) | 1; // Shift SLA left and add read bit (1)
+  // Trigger action + master acknowledge bit
+  TWCR = (1 << TWINT) | (1 << TWEA) | (1 << TWEN);
+  // Wait for completion
+  delayMs(10); // Add a small delay to ensure the slave has time to respond
+  // Trigger action + stop condition
+  TWCR = (1 << TWINT) | (1 << TWSTO) | (1 << TWEN);
+}  
+
 // 6. unsigned char Read_data()
 // - Return TWDR
+unsigned char read_data() {
+  return TWDR; // Return the data from the two wire data register
+}
