@@ -113,35 +113,6 @@ int main(){
         }
         break;
     }
-<<<<<<< HEAD
-=======
-    else {
-      changeDutyCycle(0); // Turn off motor when countdown reaches 0
-    }
-  
-    if (sevenSegmentTimerFlag) {
-      if (countdown >= 0) {
-      displayDigit(countdown);
-      countdown -= 1; // Example countdown decrement, replace with actual timer interrupt logic
-      Serial.print("Countdown: ");
-      Serial.println(countdown);
-      }
-      else {
-        turnOffSSD();
-      }
-      
-      if (countdown >= 0) {
-        displayDigit(countdown);
-        countdown -= 1; // Example countdown decrement, replace with actual timer interrupt logic
-      }
-      else {
-        turnOffSSD();
-      }
-      sevenSegmentTimerFlag = false; // Reset flag until next timer interrupt
-      startTimer1(); // Start timer 1 for countdown
-    }
-  return 0;
->>>>>>> be18a2641fc2968e90eae6e83aaf6a1484063f4b
   }
 
   return 0;
