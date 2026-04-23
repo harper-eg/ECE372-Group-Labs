@@ -9,7 +9,7 @@
  * Set appropriate PWM mode and output pin(s).
  */
 void initPWM(){
-    // Motor direction pins: PB0 (IN1) and PB1 (IN2) on L293D
+    // Motor direction pins: PE0 and PE1 (IN2) on L293D
     DDRB |= (1 << DDB0) | (1 << DDB1); // Set PB0 and PB1 as outputs 
     
     
