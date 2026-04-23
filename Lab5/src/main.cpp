@@ -1,5 +1,26 @@
 #include <Arduino.h>
+#include <avr/io.h>
+#include <avr/interrupt.h>
+#include "switch.h"
+#include "timer.h"
+#include "pwm.h"
+#include "i2c.h"
+#include "spi.h"
 
+typedef enum buttonState_enum {
+  wait_press, debounce_press,
+  wait_release, debounce_release
+} buttonState;
+
+// Main application states
+typedef enum LED_enum {
+  motor_running,
+  motor_off_countdown
+} LED;
+
+// Initialize states
+volatile buttonState switchState = wait_press;
+volatile LED appState = ;
 
 
 // read address is 7-bit I2C address for the device is 0x1D

@@ -84,7 +84,6 @@ TWCR = (1<<TWINT) | (1<<TWEN);
 }
 
 
-
 // 6. unsigned char Read_data()
 // - Return TWDR
 unsigned char read_data() {
