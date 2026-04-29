@@ -9,6 +9,7 @@ void initSPI();
 void writeSPI(unsigned char regAddress, int data);
 unsigned char readSPI( unsigned char regAddress);
 int* readAccel();
+void writeLED(bool faceState);
 
 
 #endif
