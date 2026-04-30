@@ -1,9 +1,9 @@
-// Author:
-// Net ID:
+// Authors:
+// Net IDs:
 // Date:
-// Assignment:     Lab 4
+// Assignment: Lab 5
 //
-// Description: This file describes functions used by the timer
+// Description: Millisecond timer used for switch debouncing (Timer 1).
 //----------------------------------------------------------------------//
 
 #ifndef TIMER_H
@@ -11,10 +11,7 @@
 
 #include <avr/io.h>
 
-void initTimer0();
-void delayMs(unsigned int delay);
 void initTimer1();
-void startTimer1();
-void stopTimer1();
+void delayMs(unsigned int delay);
 
 #endif

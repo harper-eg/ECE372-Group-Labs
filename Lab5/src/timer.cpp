@@ -1,82 +1,35 @@
-// Author:
-// Net ID:
+// Authors:
+// Net IDs:
 // Date:
-// Assignment:     Lab 4
+// Assignment: Lab 5
 //
-// Description: This file implements functions that utilize the timers
+// Precise millisecond timer used for switch debouncing.
+// Timer 1 in CTC mode, prescaler 64 → 250 counts per ms at 16 MHz.
 //----------------------------------------------------------------------//
 
 #include "timer.h"
 
-/* Initialize timer 0 for debouncing. CTC mode. */
-void initTimer0(){
-    // CTC SETTING IN THE TIMER REGISTER
-    TCCR0A&=~(1 << WGM00);
-    TCCR0A|=(1 << WGM01);
-    TCCR0B&=~(1 << WGM02);
-
+void initTimer1() {
+    // CTC mode (WGM12 set, others cleared); clock stays stopped until delayMs.
+    TCCR1A = 0;
+    TCCR1B = (1 << WGM12);
+    OCR1A  = 250;                                   // 1 ms at /64
 }
 
-/* This delays the program an amount specified by unsigned int delay.
-* Use timer 0. Prescalar of 64, precise to 1 millisecond.
-*/
-void delayMs(unsigned int delay){
+void delayMs(unsigned int delay) {
+    OCR1A = 250;
+    TCNT1 = 0;
+    TIFR1 |= (1 << OCF1A);                          // clear stale flag
 
-    unsigned int count = 0;
-    //delay will be measured in milliseconds, and with a prescalar of 64 so OCR0A will count to 1 ms every 250 counts
+    // Start Timer 1 with prescaler /64.
+    TCCR1B |= (1 << CS11) | (1 << CS10);
+    TCCR1B &= ~(1 << CS12);
 
-    OCR0A = 250; // Appropriate count value
-
-    //Normal clock frequency of 16MHz
-    //These statements starts the timer with the prescalar set to 64
-    TCCR0B &= ~(1 << CS02);
-    TCCR0B |= ((1 << CS01) | (1 << CS00));
-
-    while(count < delay){ //if we still need to delay by more miliseconds
-
-        TIFR0 |= (1 << OCF0A); //this sets the CTC flag down, so that we can start a new clock delay (flag down is logic 1)
-        TCNT0 = 0; //clears the timer
-
-        //while flag is down do not do anything
-        while(!(TIFR0 & (1 << OCF0A)));
-
-        count++; //increment counter
+    for (unsigned int i = 0; i < delay; i++) {
+        while (!(TIFR1 & (1 << OCF1A)));
+        TIFR1 |= (1 << OCF1A);
     }
 
-    TCCR0B &= ~((1 << CS02) | (1 << CS01) | (1 << CS00)); //turns timer off
-}
-
-/* Initialize timer 1 for the 10-second seven segment countdown.
-*  Should use CTC mode with an interrupt to count 1-second intervals.
-*/
-void initTimer1(){
-    // CTC mode (from Lab 3)
-    TCCR1A &= ~((1 << WGM11) | (1 << WGM10));
-    TCCR1B |= (1 << WGM12);
-    TCCR1B &= ~(1 << WGM13);
-
-    // TODO: Set OCR1A for a 1-second interval using an appropriate prescaler
-    // TODO: Enable Timer1 compare match A interrupt (OCIE1A in TIMSK1)
-    // TODO: Set prescaler bits (CS12:CS10) for desired prescaler
-}
-
-void startTimer1() {
-    // Set OCR1A for 1-second interval with prescaler of 1024
-    OCR1A = 15624; // (16MHz / 1024) - 1 = 15624 counts for 1 second
-
-    TCNT1 = 0; // Reset counter so first interval is a full second
-
-    // Enable Timer1 compare match A interrupt
-    TIMSK1 |= (1 << OCIE1A);
-
-    // Start Timer1 with prescaler of 1024
-    TCCR1B |= (1 << CS12) | (1 << CS10);
-    TCCR1B &= ~(1 << CS11);
-}
-
-void stopTimer1() {
-    // Stop Timer1 clock
+    // Stop Timer 1 so it stays free for any future use.
     TCCR1B &= ~((1 << CS12) | (1 << CS11) | (1 << CS10));
-    // Disable Timer1 compare match A interrupt
-    TIMSK1 &= ~(1 << OCIE1A);
 }

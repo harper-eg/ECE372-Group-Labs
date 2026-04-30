@@ -4,8 +4,7 @@
 #include <avr/io.h>
 
 void initPWM();
-void changeDutyCycle(unsigned int adcValue);
-
-// TODO: Add any additional PWM function prototypes as needed
+void startChirp();
+void stopChirp();
 
 #endif
