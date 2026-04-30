@@ -104,12 +104,12 @@ bool read_acceleration_threshold() {
     accelZ0 = read(MPU6050_ADDR, ACCEL_ZOUT_L); // Read Z low byte
 
     // Combine the high and low bytes for each axis
-    int accelX = (accelX1 << 8) | accelX0;
-    int accelY = (accelY1 << 8) | accelY0;
-    int accelZ = (accelZ1 << 8) | accelZ0;
+    int accelX = ((int16_t)(int8_t)accelX1 << 8) | accelX0;
+    int accelY = ((int16_t)(int8_t)accelY1 << 8) | accelY0;
+    int accelZ = ((int16_t)(int8_t)accelZ1 << 8) | accelZ0;
 
-    // Check if any of the acceleration values exceed the threshold of 200
-    if (abs(accelX) > 200 || abs(accelY) > 200 || abs(accelZ) > 200) {
+    // Check if any of the acceleration values exceed the threshold
+    if (abs(accelY) > 11000 || abs(accelZ) < 11000) {
         return true; // Threshold exceeded
     } else {
         return false; // Threshold not exceeded

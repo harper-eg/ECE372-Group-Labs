@@ -15,15 +15,8 @@
 #include "i2c.h"
 #include "spi.h"
 
-// --- MPU-6050 register map (Register Map datasheet, I2C SLA = WHO_AM_I = 0x68) ---
-#define MPU6050_ADDR  0x68   // 7-bit slave address (WHO_AM_I value, pg. 46)
-#define PWR_MGMT_1    0x6B   // Power management register (pg. 41); write 0x00 to wake
-#define ACCEL_XOUT_H  0x3B   // X-axis high byte (pg. 30)
-#define ACCEL_XOUT_L  0x3C   // X-axis low byte
-#define ACCEL_YOUT_H  0x3D   // Y-axis high byte
-#define ACCEL_YOUT_L  0x3E   // Y-axis low byte
-#define ACCEL_ZOUT_H  0x3F   // Z-axis high byte
-#define ACCEL_ZOUT_L  0x40   // Z-axis low byte
+// External declarations for acceleration data
+extern unsigned char accelX0, accelX1, accelY0, accelY1, accelZ0, accelZ1;
 
 // Tilt threshold in raw LSB units.
 // At ±2g full scale: 1g = 16384 LSB; sin(45°)*16384 ≈ 11585.
@@ -110,36 +103,14 @@ int main() {
     }
 
     // ----------------------------------------------------------------
-    // Read accelerometer: X, Y, Z high and low bytes over I2C
-    //
-    // NOTE: The current i2c.cpp read() issues a repeated-start and reads
-    // two bytes (MPU-6050 auto-increments the register pointer).  Only the
-    // last byte is accessible via read_data() / TWDR.  If readings look
-    // wrong, update i2c.cpp to perform a single-byte read per call.
+    // Read accelerometer and check threshold
     // ----------------------------------------------------------------
+    bool threshold_exceeded = read_acceleration_threshold();
 
-    // X axis
-    read(MPU6050_ADDR, ACCEL_XOUT_H);
-    int8_t xH = (int8_t)read_data();
-    read(MPU6050_ADDR, ACCEL_XOUT_L);
-    uint8_t xL = read_data();
-
-    // Y axis
-    read(MPU6050_ADDR, ACCEL_YOUT_H);
-    int8_t yH = (int8_t)read_data();
-    read(MPU6050_ADDR, ACCEL_YOUT_L);
-    uint8_t yL = read_data();
-
-    // Z axis
-    read(MPU6050_ADDR, ACCEL_ZOUT_H);
-    int8_t zH = (int8_t)read_data();
-    read(MPU6050_ADDR, ACCEL_ZOUT_L);
-    uint8_t zL = read_data();
-
-    // Combine high and low bytes into signed 16-bit values
-    int16_t accelX = ((int16_t)xH << 8) | xL;
-    int16_t accelY = ((int16_t)yH << 8) | yL;
-    int16_t accelZ = ((int16_t)zH << 8) | zL;
+    // Combine high and low bytes into signed 16-bit values for printing
+    int16_t accelX = ((int16_t)(int8_t)accelX1 << 8) | accelX0;
+    int16_t accelY = ((int16_t)(int8_t)accelY1 << 8) | accelY0;
+    int16_t accelZ = ((int16_t)(int8_t)accelZ1 << 8) | accelZ0;
 
     // Print for debugging and threshold calibration
     Serial.print("X: "); Serial.print(accelX);
@@ -155,7 +126,7 @@ int main() {
         // Check for tilt on Y or Z axis exceeding ~45 degrees.
         // At rest: Y ≈ 0, Z ≈ 16384.  At 45° tilt: |Y| or |Z| ≈ 11585.
         // Z check: abs(accelZ) < ACCEL_THRESHOLD catches Z dropping from 16384.
-        if (abs(accelY) > ACCEL_THRESHOLD || abs(accelZ) < ACCEL_THRESHOLD) {
+        if (threshold_exceeded) {
           appState = alarm_on;
           write_LED(0);   // switch to frowny face
 
