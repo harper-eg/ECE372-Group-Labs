@@ -1,6 +1,25 @@
 #include "i2c.h"
 #include <avr/io.h>
 #include "timer.h"
+#include <math.h>
+#include <stdlib.h>
+
+// MPU-6050 register addresses
+#define MPU6050_ADDR  0x68
+#define ACCEL_XOUT_H  0x3B
+#define ACCEL_XOUT_L  0x3C
+#define ACCEL_YOUT_H  0x3D
+#define ACCEL_YOUT_L  0x3E
+#define ACCEL_ZOUT_H  0x3F
+#define ACCEL_ZOUT_L  0x40
+
+unsigned char accelX0 = 0; // Read X0
+unsigned char accelX1 = 0; // Read X1
+unsigned char accelY0 = 0; // Read Y0
+unsigned char accelY1 = 0; // Read Y1
+unsigned char accelZ0 = 0; // Read Z0
+unsigned char accelZ1 = 0; // Read Z1
+
 // I2C Functions:
 
 
@@ -47,45 +66,52 @@ TWCR = (1<<TWINT) | (1<<TWEN); // clear flag
 
 
 
-void read(unsigned char add, unsigned char internal){
+unsigned char read(unsigned char add, unsigned char internal){
+  
+unsigned char data; 
 
-unsigned char var; 
-
-TWCR = (1<< TWINT) | (1<< TWSTA) | (1<< TWEN); //resets flag
+TWCR = (1<< TWINT) | (1<< TWSTA) | (1<< TWEN); // start
 
 while (!(TWCR & (1<<TWINT))); //wait while flag is low
-TWDR = (add << 1) |0; //load address and write bit(0)
+TWDR = (add << 1) | 0; //load address and write bit(0)
 TWCR = (1<<TWINT) | (1<<TWEN); //clear flag and enable TWI
 
 while(!(TWCR & (1<<TWINT)));
-TWDR = internal; 
+TWDR = internal; // register address
 TWCR = (1<<TWINT) | (1<<TWEN);
 
 while(!(TWCR & (1<<TWINT)));
-TWCR = (1<<TWEN) | (1<<TWINT) | (1<<TWSTA); //another start con
+TWCR = (1<<TWEN) | (1<<TWINT) | (1<<TWSTA); // restart
 
 while (!(TWCR & (1<<TWINT))); //wait while flag is low
-TWDR = (add << 1) |1; //load address and write bit(0)
-TWCR = (1<<TWINT) | (1<<TWEN); //clear flag and enable TWI
+TWDR = (add << 1) | 1; //load address and read bit(1)
+TWCR = (1<<TWINT) | (1<<TWEN); //clear flag and enable TWI, no TWEA for NACK
 
 while(!(TWCR & (1<<TWINT)));
-var = (TWDR << 8);
-TWCR = (1<<TWINT) | (1<<TWEN);
-
-while(!(TWCR & (1<<TWINT)));
-TWCR = (1<<TWEA) | (1<<TWINT) | (1<<TWEN);
-
-while(!(TWCR & (1<<TWINT)));
-var += TWDR; 
-TWCR = (1<<TWINT) | (1<<TWEN); 
-
- while (!(TWCR & (1<<TWINT))); // wait for flag to set
- TWCR = (1<<TWINT)|(1<<TWEN)|(1<< TWSTO); //send stop condition
+data = TWDR; // read the data
+TWCR = (1<<TWINT)|(1<<TWEN)|(1<< TWSTO); //send stop condition
+return data;
 }
 
 
-// 6. unsigned char Read_data()
-// - Return TWDR
-unsigned char read_data() {
-  return TWDR; // Return the data from the two wire data register
+bool read_acceleration_threshold() {
+    // Read the acceleration data from the sensor
+    accelX1 = read(MPU6050_ADDR, ACCEL_XOUT_H); // Read X high byte
+    accelX0 = read(MPU6050_ADDR, ACCEL_XOUT_L); // Read X low byte
+    accelY1 = read(MPU6050_ADDR, ACCEL_YOUT_H); // Read Y high byte
+    accelY0 = read(MPU6050_ADDR, ACCEL_YOUT_L); // Read Y low byte
+    accelZ1 = read(MPU6050_ADDR, ACCEL_ZOUT_H); // Read Z high byte
+    accelZ0 = read(MPU6050_ADDR, ACCEL_ZOUT_L); // Read Z low byte
+
+    // Combine the high and low bytes for each axis
+    int accelX = (accelX1 << 8) | accelX0;
+    int accelY = (accelY1 << 8) | accelY0;
+    int accelZ = (accelZ1 << 8) | accelZ0;
+
+    // Check if any of the acceleration values exceed the threshold of 200
+    if (abs(accelX) > 200 || abs(accelY) > 200 || abs(accelZ) > 200) {
+        return true; // Threshold exceeded
+    } else {
+        return false; // Threshold not exceeded
+    }
 }

@@ -4,7 +4,7 @@
 
 void initI2C();
 void sendDataI2C(unsigned char add,unsigned char internal, unsigned char send);
-void read(unsigned char add, unsigned char internal);
+unsigned char read(unsigned char add, unsigned char internal);
 unsigned char read_data();
 
 
